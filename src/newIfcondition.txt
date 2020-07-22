@@ -1,0 +1,359 @@
+import React, { useState, useEffect, useContext } from 'react';
+import PropTypes from 'prop-types';
+import { v4 } from 'uuid';
+import { IconBudicon, Card } from 'aera-react-library';
+
+import { getConditionalDataNode } from '../../../apiManager/ProcessDiagram';
+import {
+  groupBy,
+  removeHtmlTags,
+  swapArray,
+  cloneObject,
+  validationChange,
+  findParent,
+} from '../../../utils/Helpers';
+import {
+  conditional,
+  whileCondition,
+} from '../../ScriptNodeScene/EvaluateRules/Constants';
+import IfCards from '../../../components/DraggableCards/IfCards';
+import { Loading } from '../../../components/Loading/Loading';
+import { VARIABLE_KEYS } from '../../../lib/utils/variable';
+import { AppStoreProvider } from '../../../store/AppStoreProvider';
+import '../../ScriptNodeScene/ScriptNodeScene.scss';
+import {
+  convertToReactDateTimeFormat,
+  isPolymerDateTimeFormat,
+} from '../../../utils/Helpers';
+
+const ConditionEvaluateRules = props => {
+  const {
+    setIsNewConditionalVisible,
+    setConditionObject,
+    setEditConditionalDetails,
+    editConditionalDetails,
+    selectedNodeInfo,
+    setSelectedNodeInfo,
+    processesList,
+    selectedConditionalIndex,
+    setSelectedConditionalIndex,
+    isNewConditionalVisible,
+    context,
+    selectedNode,
+    treeValue,
+    dataTitle,
+    isViewMode,
+    conditionalResponse,
+    setConditionalResponse,
+  } = props;
+  const [conditionsList, setConditionsList] = useState([]);
+  const [noProcessVisible, setNoProcessVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { setIsProcessSaved, updateNodeInfo } = useContext(AppStoreProvider);
+
+  if (selectedNodeInfo && !selectedNodeInfo.condition) {
+    selectedNodeInfo.condition = { conditions: [] };
+  }
+
+  const handleUpdatedProps = data => {
+    const updatedNode = selectedNodeInfo;
+    if (cloneObject(updatedNode.condition.conditions) !== cloneObject(data)) {
+      Object.assign(
+        ...updatedNode.condition.conditions,
+        ...JSON.parse(JSON.stringify(data))
+      );
+      setIsProcessSaved(false);
+    }
+    setSelectedNodeInfo(updatedNode);
+  };
+
+  const searchTree = (element, matchingTitle) => {
+    let resultVal = null;
+    if (element.id === matchingTitle) {
+      resultVal = element;
+    } else if (element.children != null) {
+      let i;
+      let result = null;
+      for (i = 0; result == null && i < element.children.length; i += 1) {
+        result = searchTree(element.children[i], matchingTitle);
+      }
+      return result;
+    }
+    return resultVal;
+  };
+
+  /**
+   * ifnode
+   */
+  useEffect(() => {
+    setLoading(true);
+    getConditionalDataNode().then(resp => {
+      swapArray(resp, 0, 1);
+      setConditionalResponse(resp);
+      setLoading(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (conditionalResponse) {
+      const conditionalResp = groupBy(conditionalResponse, 'id');
+      const listData = selectedNode === 'if' ? conditional : whileCondition;
+      const dataNodeGroup = groupBy(listData, 'value');
+      const selectedIfDetails = selectedNodeInfo.condition.conditions;
+
+      const conditionsListData = [];
+
+      for (let exp = 0; exp < selectedIfDetails.length; exp += 1) {
+        const conditionType = selectedIfDetails[exp].expressions.filter(
+          expression => {
+            return expression.wizardid !== null;
+          }
+        );
+        if (conditionType.length) {
+          const conditionObject = conditionType[0];
+          const {
+            rightVar: objRightVar,
+            leftVar: objLeftVar,
+            constant,
+            comparator,
+          } = conditionObject;
+          let rightVar = '';
+          let leftVar = '';
+          let comparators = '';
+          let customName = '';
+          switch (conditionalResp[conditionType[0].wizardid][0].name) {
+            case 'Custom script':
+              customName =
+                conditionType[0].description !== ''
+                  ? conditionType[0].description
+                  : 'Custom Script';
+              conditionType[0].displayText = conditionType[0].scriptName
+                ? conditionType[0].scriptName
+                : customName;
+              break;
+            case 'Compare values':
+              if (!constant || constant === '' || constant === null) {
+                if (objRightVar) {
+                  const NestedSelectedValue = findParent(
+                    objRightVar,
+                    processesList.variables
+                  );
+                  rightVar =
+                    NestedSelectedValue && NestedSelectedValue.name
+                      ? NestedSelectedValue.name
+                      : '';
+                } else if (
+                  !objRightVar &&
+                  (!constant || constant === '' || constant === null)
+                ) {
+                  const NestedSelectedValue = findParent(
+                    objLeftVar,
+                    processesList.variables
+                  );
+                  if (
+                    NestedSelectedValue &&
+                    NestedSelectedValue.type === VARIABLE_KEYS.OBJECT &&
+                    objRightVar === null
+                  ) {
+                    rightVar = null;
+                  }
+                }
+              } else {
+                rightVar = constant && constant.name ? constant.name : constant;
+              }
+              if (objLeftVar) {
+                const NestedSelectedValue = findParent(
+                  objLeftVar,
+                  processesList.variables
+                );
+                leftVar =
+                  NestedSelectedValue && NestedSelectedValue.name
+                    ? NestedSelectedValue.name
+                    : '';
+              }
+              if (comparator) {
+                comparators = comparator;
+              } else {
+                conditionType[0].comparator = '';
+              }
+              if (leftVar) {
+                conditionType[0].displayText = `${leftVar} ${comparators} 
+                ${
+                  isPolymerDateTimeFormat(rightVar)
+                    ? convertToReactDateTimeFormat(rightVar)
+                    : rightVar
+                }`;
+              } else {
+                conditionType[0].displayText = 'New Condition';
+              }
+              break;
+            case 'Call list functions':
+              if (conditionType[0].variableId) {
+                const NestedValue = findParent(
+                  conditionType[0].variableId,
+                  processesList.variables
+                );
+                conditionType[0].displayText = conditionType[0].method
+                  ? `${dataNodeGroup[conditionType[0].method][0].name}
+                      ' for '${
+                        NestedValue && NestedValue.name ? NestedValue.name : ''
+                      }`
+                  : `Unknown method for ${
+                      NestedValue && NestedValue.name ? NestedValue.name : ''
+                    }`;
+              } else {
+                conditionType[0].displayText = 'New Condition';
+              }
+
+              break;
+            case 'Call a Function': {
+              const selectedFunction =
+                treeValue.length &&
+                searchTree(treeValue[0], conditionType[0].configurationValueId);
+              conditionType[0].displayText =
+                selectedFunction &&
+                selectedFunction.title &&
+                selectedFunction.title !== ''
+                  ? `Call ${removeHtmlTags(selectedFunction.title)}`
+                  : 'Call unset function';
+
+              break;
+            }
+            default:
+              break;
+          }
+          selectedIfDetails[exp].expressions[1].uniqueId = selectedIfDetails[
+            exp
+          ].expressions[1].uniqueId
+            ? selectedIfDetails[exp].expressions[1].uniqueId
+            : v4();
+          conditionsListData.push(selectedIfDetails[exp]);
+        }
+      }
+
+      setConditionsList(conditionsListData);
+    }
+  }, [conditionalResponse, selectedNodeInfo]);
+
+  useEffect(() => {
+    if (conditionsList.length === 0) {
+      setNoProcessVisible(true);
+    }
+  }, [conditionsList]);
+
+  const openNewCondition = () => {
+    setEditConditionalDetails(true);
+    setSelectedConditionalIndex(null);
+    setIsNewConditionalVisible(true);
+    setNoProcessVisible(false);
+    setIsProcessSaved(false);
+  };
+
+  const Props = {
+    setIsNewConditionalVisible,
+    setConditionObject,
+    editConditionalDetails,
+    setEditConditionalDetails,
+    selectedConditionalIndex,
+    setSelectedConditionalIndex,
+    selectedNodeInfo,
+    setSelectedNodeInfo,
+    isNewConditionalVisible,
+    processesList,
+    updateNodeInfo,
+  };
+  const deleteConditionalCard = (item, index) => {
+    const {
+      condition: { conditions },
+    } = selectedNodeInfo;
+    selectedNodeInfo.condition.conditions.splice(index, 1);
+    setSelectedNodeInfo(cloneObject(selectedNodeInfo));
+    setSelectedConditionalIndex(null);
+    setIsNewConditionalVisible(false);
+    const arr = validationChange(conditions);
+    Object.assign(conditions, arr);
+    setIsProcessSaved(false);
+  };
+  return (
+    <div
+      className={`evaluate-rules-container ${
+        conditionsList.length === 0 && noProcessVisible ? 'noprocess-card' : ''
+      }`}
+      data-title={dataTitle}
+    >
+      {loading ? (
+        <Loading />
+      ) : (
+        <div className="list-wrapper">
+          {conditionsList.length === 0 && noProcessVisible === true ? (
+            <div
+              className="no-process-wrapper"
+              data-title={`${selectedNode}__no-process-wrapper`}
+            >
+              <div className="box-icon" />
+              <p>No Conditions</p>
+              <div
+                onClick={openNewCondition}
+                className="button-wrapper"
+                role="presentation"
+              >
+                <IconBudicon
+                  className="script-icon add-icon"
+                  icon="outline-budicon-plus-ui"
+                />
+                <span className="button-format">New Condition</span>
+              </div>
+            </div>
+          ) : (
+            <div
+              className="card-wrapper"
+              data-title={`${selectedNode}node__card-wrapper`}
+            >
+              <Card
+                className="add-new-script script-card"
+                dataTitle={`${selectedNode}__add-new-condition`}
+              >
+                <div
+                  onClick={openNewCondition}
+                  className="button-wrapper"
+                  role="presentation"
+                >
+                  <IconBudicon
+                    className="script-icon"
+                    icon="outline-budicon-plus-ui"
+                  />
+                  <span className="button-format">New Condition</span>
+                </div>
+              </Card>
+              <IfCards
+                setIsProcessSaved={setIsProcessSaved}
+                lists={conditionsList}
+                context={context}
+                {...Props}
+                updatedProps={handleUpdatedProps}
+                deleteCallback={deleteConditionalCard}
+                dataTitle={selectedNode}
+                isViewMode={isViewMode}
+              />
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+ConditionEvaluateRules.propTypes = {
+  setIsNewConditionalVisible: PropTypes.func.isRequired,
+  setConditionObject: PropTypes.func.isRequired,
+  setEditConditionalDetails: PropTypes.func.isRequired,
+  editConditionalDetails: PropTypes.bool.isRequired,
+  selectedNodeInfo: PropTypes.shape.isRequired,
+  setSelectedNodeInfo: PropTypes.func.isRequired,
+  processesList: PropTypes.shape.isRequired,
+  selectedConditionalIndex: PropTypes.number.isRequired,
+  setSelectedConditionalIndex: PropTypes.func.isRequired,
+  context: PropTypes.func.isRequired,
+  isNewConditionalVisible: PropTypes.bool.isRequired,
+  selectedNode: PropTypes.string.isRequired,
+};
+export default ConditionEvaluateRules;

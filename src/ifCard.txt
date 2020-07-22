@@ -1,0 +1,520 @@
+import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import {
+  Card,
+  IconV1,
+  ToggleSwitch,
+  ToggleSwitchButton,
+} from 'aera-react-library';
+
+import VerticalDropdown from '../VerticalDropdown/VerticalDropdown';
+import {
+  cloneObject,
+  validationChange,
+  updateTreeObject,
+  isAvailable,
+  isObjectEqual,
+} from '../../utils/Helpers';
+
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+  return result;
+};
+
+let parenthesis = [];
+let parenthesisStack = [];
+const and = 'and';
+const or = 'or';
+const DraggableIfCards = props => {
+  const {
+    setConditionObject,
+    setSelectedConditionalIndex,
+    lists,
+    deleteCallback,
+    selectedConditionalIndex,
+    setIsNewConditionalVisible,
+    selectedNodeInfo,
+    setSelectedNodeInfo,
+    setIsProcessSaved,
+    setEditConditionalDetails,
+    processesList,
+    isNewConditionalVisible,
+    dataTitle,
+    isViewMode,
+    updateNodeInfo: updateAppData,
+  } = props;
+  const [items, setItems] = useState(lists);
+
+  useEffect(() => {
+    const itemData = [...items];
+    itemData.map((item, index) => {
+      const { expressions } = item;
+      if (index !== items.length - 1) {
+        if (expressions[3].description === '') {
+          expressions[3].description = 'AND';
+        }
+        if (expressions[3].body === null || expressions[3].body.trim() === '') {
+          expressions[3].body = '&&';
+        }
+      } else {
+        expressions[3].body = '';
+      }
+      return item;
+    });
+    validationChange(itemData);
+    if (!isObjectEqual(items, itemData)) setItems(itemData);
+  }, [items]);
+
+  const updateNodeInfo = () => {
+    const [...nodePos] = selectedNodeInfo.position;
+    nodePos.shift();
+    updateTreeObject(processesList, selectedNodeInfo, nodePos)();
+  };
+
+  useEffect(() => {
+    const { condition } = selectedNodeInfo;
+    const { conditions: itemData } = condition;
+    itemData.map((item, index) => {
+      const { expressions } = item;
+      if (index !== itemData.length - 1) {
+        if (expressions[3].body === null || expressions[3].body.trim() === '') {
+          expressions[3].body = '&&';
+        }
+        if (
+          expressions[3].description.trim() === '' ||
+          expressions[3].description === null
+        ) {
+          expressions[3].description = 'AND';
+        }
+      } else {
+        expressions[3].body = '';
+      }
+      return item;
+    });
+    updateNodeInfo();
+    updateAppData(selectedNodeInfo);
+    // setIsProcessSaved(saveStatus);
+  }, [selectedNodeInfo]);
+
+  const handleClick = (item, index, value) => {
+    const nodeData = selectedNodeInfo;
+    const {
+      condition: { conditions },
+    } = nodeData;
+    const { expressions } = item;
+    if (value === and) {
+      expressions[3].body = '&&';
+      expressions[3].description = 'AND';
+      items[index].expressions[3].body = '&&';
+      items[index].expressions[3].description = 'AND';
+    } else if (value === or) {
+      expressions[3].body = '||';
+      expressions[3].description = 'OR';
+      items[index].expressions[3].body = '||';
+      items[index].expressions[3].description = 'OR';
+    }
+    Object.assign(conditions, items);
+    setItems(cloneObject(items));
+    setSelectedNodeInfo(cloneObject(nodeData));
+    setIsProcessSaved(false);
+  };
+
+  const disableLeft = () => {
+    const itemData = lists;
+    itemData.map(item => {
+      const { expressions } = item;
+      Object.assign(expressions[0], {
+        isLeftDisabled: false,
+      });
+    });
+  };
+
+  const makeTopEnable = firstElement => {
+    const itemData = lists;
+    itemData.map(item => {
+      const { expressions } = item;
+      if (firstElement && expressions[1].uniqueId === firstElement.id) {
+        Object.assign(expressions[0], { isErrorTop: false });
+      }
+      return item;
+    });
+    setItems(lists);
+  };
+
+  const grouping = (firstElement, lastElement = null) => {
+    const itemData = lists;
+    let isGroup = 0;
+    itemData.map(item => {
+      const { expressions } = item;
+      if (firstElement && expressions[1].uniqueId === firstElement.id) {
+        isGroup += 1;
+        Object.assign(expressions[0], { isGroup: true, isErrorTop: true });
+      }
+      if (lastElement && isGroup > 0) {
+        Object.assign(expressions[0], { isGroup: true });
+      }
+      if (
+        !firstElement &&
+        lastElement &&
+        expressions[1].uniqueId === lastElement.id
+      ) {
+        Object.assign(expressions[0], { isGroup: true, isErrorBottom: true });
+      }
+      if (lastElement && expressions[1].uniqueId === lastElement.id) {
+        isGroup -= 1;
+        Object.assign(expressions[0], { isGroup: true });
+        if (firstElement && lastElement) {
+          Object.assign(expressions[0], { isErrorBottom: false });
+        }
+        makeTopEnable(firstElement);
+      }
+
+      return item;
+    });
+    setItems(lists);
+  };
+
+  const calculateParenthesis = listss => {
+    const itemData = listss;
+    itemData.map(item => {
+      const { expressions } = item;
+      if (
+        expressions[0].body &&
+        expressions[0].body.trim() === '' &&
+        expressions[2].body &&
+        expressions[2].body.trim() === ''
+      ) {
+        const obj = { id: expressions[1].uniqueId };
+        if (isAvailable(parenthesis, obj, 'id')) {
+          const EmptyConditionList = parenthesis.filter(
+            value => value.id !== expressions[1].uniqueId
+          );
+          parenthesis = EmptyConditionList;
+          const updatedParentesisStack = parenthesisStack.filter(
+            value => value.id !== expressions[1].uniqueId
+          );
+          parenthesisStack = updatedParentesisStack;
+        }
+      }
+      return item;
+    });
+    if (parenthesis.length > 0) {
+      const updatedParenthesisStack = [...parenthesisStack];
+      const parenthesisArr = parenthesis.map(eachItem => {
+        if (
+          eachItem.type === 'open' &&
+          !isAvailable(updatedParenthesisStack, eachItem, 'id')
+        ) {
+          updatedParenthesisStack.push(eachItem);
+          parenthesisStack.push(eachItem);
+          grouping(eachItem);
+        }
+        if (eachItem.type === 'close') {
+          const lastElement = updatedParenthesisStack.pop();
+          parenthesisStack.pop();
+          grouping(lastElement, eachItem);
+        }
+        return eachItem;
+      });
+    }
+  };
+
+  const findId = (ArrayToCheck, objTofind) => {
+    const result = ArrayToCheck.find(eachValue => {
+      return eachValue.id === objTofind.id;
+    });
+    return result;
+  };
+
+  useEffect(() => {
+    const itemData = lists;
+    parenthesis = [];
+    parenthesisStack = [];
+    let groupCount = 0;
+    itemData.map(item => {
+      const { expressions } = item;
+      Object.assign(expressions[0], {
+        isGroup: false,
+        isMiddle: false,
+        isLeftDisabled: false,
+      });
+      if (expressions[0].body === '(' || expressions[0].body === '!(') {
+        groupCount += 1;
+        Object.assign(expressions[0], { isLeftDisabled: false });
+        const obj = { id: expressions[1].uniqueId, type: 'open' };
+        if (!isAvailable(parenthesis, obj, 'id')) parenthesis.push(obj);
+        else {
+          const availableList = findId(parenthesis, obj);
+          if (availableList.type === 'open') parenthesis.push(obj);
+        }
+      }
+      if (
+        expressions[0].body !== '(' &&
+        expressions[0].body !== '!(' &&
+        groupCount > 0
+      ) {
+        Object.assign(expressions[0], { isLeftDisabled: true });
+      }
+      if (expressions[2].body === ')') {
+        groupCount -= 1;
+        if (groupCount > 0) Object.assign(expressions[0], { isMiddle: true });
+        else Object.assign(expressions[0], { isMiddle: false });
+        Object.assign(expressions[0], { isGroup: true });
+        const obj = { id: expressions[1].uniqueId, type: 'close' };
+        if (!isAvailable(parenthesis, obj, 'id')) parenthesis.push(obj);
+        else {
+          const availableList = findId(parenthesis, obj);
+          if (availableList.type === 'open') parenthesis.push(obj);
+        }
+        disableLeft();
+      }
+      return item;
+    });
+    calculateParenthesis(lists);
+    setItems(cloneObject(lists));
+  }, [lists]);
+
+  const handleList = (item, index) => {
+    setEditConditionalDetails(false);
+    setIsNewConditionalVisible(true);
+    setConditionObject(item.expressions[1]);
+    setSelectedConditionalIndex(index);
+  };
+
+  const onDragEnd = result => {
+    setIsNewConditionalVisible(false);
+    setSelectedConditionalIndex(null);
+    if (!result.destination) {
+      return;
+    }
+    const nodeData = selectedNodeInfo;
+    const {
+      condition: { conditions },
+    } = nodeData;
+    const item = reorder(items, result.source.index, result.destination.index);
+    Object.assign(conditions, item);
+    setItems(item);
+    setSelectedNodeInfo(cloneObject(nodeData));
+    setIsProcessSaved(false);
+  };
+
+  const deletehandler = (e, item, index) => {
+    e.stopPropagation();
+    deleteCallback(item, index);
+  };
+
+  const itemCallbackHandler = (data, operatorType) => {
+    const nodeData = selectedNodeInfo;
+    const {
+      condition: { conditions },
+    } = nodeData;
+    const itemData = items;
+    itemData.map(item => {
+      const { expressions } = item;
+      if (item.expressions[1].uniqueId === data.expressions[1].uniqueId) {
+        if (operatorType === 'left') {
+          expressions[0].body = data.expressions[0].body;
+        } else {
+          expressions[2].body = data.expressions[2].body;
+        }
+      }
+      return item;
+    });
+    Object.assign(conditions, itemData);
+    setSelectedNodeInfo(cloneObject(nodeData));
+    setItems(cloneObject(itemData));
+
+    setIsProcessSaved(false);
+    Object.assign(lists, itemData);
+  };
+  return (
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable isDropDisabled={isViewMode} droppableId="droppable">
+        {droppableProvided => (
+          <div
+            className="ifcards-wrapper"
+            {...droppableProvided.droppableProps}
+            ref={droppableProvided.innerRef}
+            data-title={`${dataTitle}__cards-wrapper`}
+          >
+            {items.map((item, index) => (
+              <Draggable
+                isDragDisabled={isViewMode}
+                key={item.expressions[1].uniqueId}
+                draggableId={item.expressions[1].uniqueId}
+                index={index}
+              >
+                {provided => (
+                  <div
+                    className={`Drag-item  ${
+                      (item.expressions[0].body === '(' ||
+                        item.expressions[0].body === '!(') &&
+                      item.expressions[0].isErrorTop === false
+                        ? `top-border`
+                        : ``
+                    }
+                    ${
+                      (item.expressions[0].body === '(' ||
+                        item.expressions[0].body === '!(') &&
+                      item.expressions[0].isErrorTop === true
+                        ? `top-error-border`
+                        : ``
+                    }
+                   `}
+                    data-title={`${dataTitle}__drag-item-${index}`}
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                  >
+                    <div
+                      className={`ifcards-wrapper__card ${
+                        index === selectedConditionalIndex &&
+                        isNewConditionalVisible
+                          ? `card-active`
+                          : ``
+                      }`}
+                      data-title={`${dataTitle}__wrapper__card-${index}`}
+                    >
+                      <VerticalDropdown
+                        position="left"
+                        itemValue={item.expressions[0].body}
+                        itemObj={item}
+                        itemCallback={data => {
+                          itemCallbackHandler(data, 'left');
+                        }}
+                      />
+                      <div
+                        className="ifcards-wrapper__card-holder"
+                        onClick={() => {
+                          handleList(item, index);
+                        }}
+                        role="presentation"
+                      >
+                        <Card
+                          className={`script-card ${
+                            index === selectedConditionalIndex
+                              ? `script-card-active`
+                              : ``
+                          } ${
+                            item.expressions[2].body === ')' &&
+                            item.expressions[0].isErrorBottom === false
+                              ? `bottom-border`
+                              : ``
+                          }
+                          ${
+                            item.expressions[2].body === ')' &&
+                            item.expressions[0].isErrorBottom === true
+                              ? `bottom-error-border`
+                              : ``
+                          }
+                          ${
+                            item.expressions[0].isGroup &&
+                            !item.expressions[0].isErrorTop &&
+                            !item.expressions[0].isErrorBottom
+                              ? `side-border`
+                              : ``
+                          }`}
+                        >
+                          <span className="indication-arrow" />
+                          <div>
+                            <div className="card-item">
+                              <div {...provided.dragHandleProps}>
+                                <IconV1
+                                  className={`script-hover drag ${
+                                    index === selectedConditionalIndex
+                                      ? `active`
+                                      : ``
+                                  }`}
+                                  icon="drag"
+                                />
+                              </div>
+                              <div className="text-wrapper">
+                                {item.expressions[1].displayText}
+                              </div>
+                              <div className="script-delete">
+                                <IconV1
+                                  className={`script-hover trash ${
+                                    index === selectedConditionalIndex
+                                      ? `active`
+                                      : ``
+                                  }`}
+                                  icon="delete"
+                                  onClick={e => {
+                                    deletehandler(e, item, index);
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      </div>
+                      <VerticalDropdown
+                        position="right"
+                        itemValue={item.expressions[2].body}
+                        itemObj={item}
+                        itemCallback={data => {
+                          itemCallbackHandler(data, 'right');
+                        }}
+                      />
+                    </div>
+                    {index !== items.length - 1 && (
+                      <div
+                        className={`drag-logic ${
+                          (item.expressions[0].isGroup ||
+                            item.expressions[0].isMiddle) &&
+                          !item.expressions[0].isErrorTop
+                            ? `side-border`
+                            : ``
+                        } ${
+                          item.expressions[2].body === ')' &&
+                          !item.expressions[0].isMiddle
+                            ? `border-none`
+                            : ``
+                        }`}
+                      >
+                        <div>
+                          <ToggleSwitch
+                            value={item.expressions[3].description.toLowerCase()}
+                            onChange={(cmp, value) =>
+                              handleClick(item, index, value)
+                            }
+                            className="logical-switch"
+                            disabled={isViewMode}
+                          >
+                            <ToggleSwitchButton value={and}>
+                              and
+                            </ToggleSwitchButton>
+                            <ToggleSwitchButton value={or}>
+                              or
+                            </ToggleSwitchButton>
+                          </ToggleSwitch>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {droppableProvided.placeholder}
+          </div>
+        )}
+      </Droppable>
+    </DragDropContext>
+  );
+};
+DraggableIfCards.propTypes = {
+  setConditionObject: PropTypes.func.isRequired,
+  setSelectedConditionalIndex: PropTypes.func.isRequired,
+  lists: PropTypes.shape.isRequired,
+  deleteCallback: PropTypes.func.isRequired,
+  selectedConditionalIndex: PropTypes.number.isRequired,
+  setIsNewConditionalVisible: PropTypes.func.isRequired,
+  selectedNodeInfo: PropTypes.shape.isRequired,
+  setSelectedNodeInfo: PropTypes.func.isRequired,
+  setEditConditionalDetails: PropTypes.func.isRequired,
+  isNewConditionalVisible: PropTypes.bool.isRequired,
+  processesList: PropTypes.shape.isRequired,
+};
+export default DraggableIfCards;

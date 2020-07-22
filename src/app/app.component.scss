@@ -1,0 +1,225 @@
+
+.container{
+    margin: 5% 32%;
+}
+
+.title{
+   font-size: larger;
+}
+
+.tab-height{
+ height: 28em;
+ 
+}
+
+.set-margin{
+    position: relative;
+    left: 31%;
+    top: 44%;
+}
+
+.set-position{
+    position: relative;
+    bottom: 5px;
+}
+
+.add-link{
+    color: blue;
+}
+
+.cursor{
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.block{
+    position: relative;
+    padding: 0.3em;
+    border: 1px solid #ebebeb;
+    background-color: white;
+    min-height: 21px;
+    width: 95%;
+}
+
+.set-border{
+    padding: 0.3em;
+}
+
+.query-position{
+    display: inline-block;
+    padding: 0.3em;
+    position: absolute;
+    left: 0px;
+    background-color: white;
+    width: 49px;
+    bottom: 1px;
+    //background-image: url('./fonts/icons8-unavailable-26.png');
+    //background-repeat: no-repeat;
+    //background-size: 18px;
+    //background-position: left;
+    padding-left: 21px;
+}
+
+.set-newmargin{
+   // padding-left: 5em;
+   display: inline-block;
+    position: absolute;
+    padding-left: 8px ;
+    top: 11px;
+}
+
+.query-margin
+{
+    padding: 4px;
+    font-size: 17px;
+    position: absolute;
+    bottom: 16%;
+}
+
+.set-right{
+    position: absolute;
+    right: 0;
+}
+
+.condition-margin
+{
+    margin: 4% 0 4% 34%;
+    padding: 1% 0%;
+    background-color: white;
+    width: 21%;
+}
+
+.condition-margin :focus{
+outline: none;
+}
+
+input[type="button"]
+{
+    background-color: white;
+    border: none;
+    margin-left: 26%;
+}
+
+.input-container{
+    display: inline-block;
+}
+
+.input-container :focus{
+    outline: none;
+}
+
+.set-input
+{
+    border: none;
+    //margin-left: 50%;
+}
+
+.close-brace
+{
+    display: inline-block;
+    padding: 0.3em;
+    position: absolute;
+    right: 7px;
+    background-color: white;
+    bottom: 1px;
+    // background-size: 18px;
+    // background-position: left;
+    padding-left: 21px;
+}
+
+.close-brace:active{
+    outline:none
+
+}
+
+input[type="submit"]
+{
+    background-color: white;
+    border: none;
+    color: blue;
+    position: absolute;
+    font-size: large;
+    right: 0;
+}
+
+.disable-outline :hover{
+    outline: none;
+}
+
+.example-box {
+    width: 200px;
+    height: 200px;
+    border: solid 1px #ccc;
+    color: rgba(0, 0, 0, 0.87);
+    cursor: move;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: #fff;
+    border-radius: 4px;
+    position: relative;
+    z-index: 1;
+    transition: box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+                0 2px 2px 0 rgba(0, 0, 0, 0.14),
+                0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  }
+  
+  .example-box:active {
+    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                0 3px 14px 2px rgba(0, 0, 0, 0.12);
+  }
+
+  .example-list {
+    width: 500px;
+    max-width: 100%;
+    border: solid 1px #ccc;
+    min-height: 60px;
+    display: block;
+    background: white;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+ .selectStyle{
+    border: none;
+    background-color: white;
+    margin-left: 95px;
+ }
+
+ .selectStyle:focus{
+     outline: none;
+ }
+
+ .dropdownStyle{
+     display: inline-block;
+ }
+
+ .mat-form-field-infix{
+     padding: 0;
+     background-color: white;
+ }
+
+ .mat-form-field-infix:focus{
+     outline: none;
+ }
+
+ .mat-form-field-appearance-fill .mat-form-field-flex {
+     padding: 0;
+ }
+ .mat-form-field-wrapper{
+     padding-bottom: 0;
+ }
+
+ .filterStyle{
+    padding: 15px 0 16px 0;
+    box-shadow: 5px 5px 5px 10px ghostwhite inset;
+    margin-top: inherit;
+ }
+
+
+
+
+

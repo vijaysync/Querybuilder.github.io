@@ -1,0 +1,168 @@
+import React, { useState, useEffect } from 'react';
+import { ContextMenu, IconBudicon } from 'aera-react-library';
+
+import { groupBy, getSymbolColor } from '../../utils/Helpers';
+import './VerticalDropdown.scss';
+
+const DropdownListItemsBasedOnType = (type = 'left') => {
+  let operators;
+  switch (type) {
+    case 'left':
+      operators = [
+        {
+          id: '1',
+          name: ' ',
+          icon: 'outline-budicon-empty-icon',
+          text: ' ',
+        },
+        {
+          id: '2',
+          name: ' ',
+          text: '(',
+          title: 'Brackets cannot be opened until previous brackets are closed',
+          icon: 'outline-budicon-open_bracket-icon',
+        },
+        {
+          id: '3',
+          name: ' ',
+          text: '!',
+          icon: 'outline-budicon-exclamation-icon',
+        },
+        {
+          id: '4',
+          name: ' ',
+          text: '!(',
+          title: 'Brackets cannot be opened until previous brackets are closed',
+          icon: 'outline-budicon-exclamation_bracket-icon',
+        },
+      ];
+      break;
+    case 'right':
+      operators = [
+        {
+          id: '1',
+          name: ' ',
+          icon: 'outline-budicon-empty-icon',
+          text: ' ',
+        },
+        {
+          id: '2',
+          name: ' ',
+          text: ')',
+          icon: 'outline-budicon-close_bracket-icon',
+        },
+      ];
+      break;
+    default:
+      break;
+  }
+  return operators;
+};
+const operatorsValues = [
+  {
+    id: '1',
+    name: ' ',
+    text: ' ',
+  },
+  {
+    id: '2',
+    name: ' ',
+    text: '(',
+  },
+  {
+    id: '3',
+    name: ' ',
+    text: '!',
+  },
+  {
+    id: '4',
+    name: ' ',
+    text: '!(',
+  },
+  {
+    id: '5',
+    name: ' ',
+    text: ')',
+  },
+];
+const VerticalDropdown = props => {
+  const { position, onOutsideClick, onItemSelect, itemCallback } = props;
+  const values = DropdownListItemsBasedOnType(position);
+  const [listValues, setListValues] = useState(values);
+  const { itemValue, itemObj } = props;
+  const [selectedItem, setSelectedItem] = useState(values[0]);
+  const [isOpen, setIsOpen] = useState(false);
+  const { expressions } = itemObj;
+  const { isLeftDisabled } = expressions[0];
+
+  const clickHandler = () => {
+    setIsOpen(!isOpen);
+  };
+
+  useEffect(() => {
+    if (
+      itemValue !== undefined &&
+      itemValue !== null &&
+      itemValue.trim() !== ''
+    ) {
+      const groupedItems = groupBy(operatorsValues, 'text');
+      setSelectedItem(groupedItems[itemValue][0]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (position === 'left') {
+      const valueList = values.map(eachList => {
+        let listItem = { ...eachList };
+        if (listItem.id === '2' || listItem.id === '4') {
+          listItem = { ...listItem, disabled: isLeftDisabled };
+        }
+        return listItem;
+      });
+      setListValues(valueList);
+    }
+  }, [isLeftDisabled]);
+
+  const onOutsideClickHandler = e => {
+    setIsOpen(!isOpen);
+    if (onOutsideClick) onOutsideClick(e);
+  };
+
+  const onItemSelectHandler = (e, item) => {
+    setSelectedItem(item);
+    setIsOpen(!isOpen);
+    if (onItemSelect) onItemSelect(e, item);
+    if (position === 'left') {
+      itemObj.expressions[0].body = item.text;
+    } else {
+      itemObj.expressions[2].body = item.text;
+    }
+    if (itemCallback) itemCallback(itemObj);
+  };
+  return (
+    <div className={`dropdown-wrapper ${position || 'left'}`}>
+      <div
+        className="dropdown-header"
+        onClick={clickHandler}
+        role="presentation"
+      >
+        <span className={`focus-on ${getSymbolColor(selectedItem.text)}`}>
+          {selectedItem.text.trim() === '' ? (
+            <IconBudicon icon="outline-budicon-plus-ui" />
+          ) : (
+            selectedItem.text
+          )}
+        </span>
+      </div>
+      {isOpen && (
+        <ContextMenu
+          data={listValues}
+          onOutsideClick={onOutsideClickHandler}
+          onItemSelect={onItemSelectHandler}
+        />
+      )}
+    </div>
+  );
+};
+
+export default VerticalDropdown;
