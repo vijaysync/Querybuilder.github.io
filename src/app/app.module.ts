@@ -13,12 +13,20 @@ import { FormsModule }   from '@angular/forms';
 //import { QueryBuilderModule } from "angular2-query-builder";
 import {DragDropModule} from '@angular/cdk/drag-drop';
 import {MatSelectModule} from '@angular/material/select';
+import { TabComponent } from './tab/tab.component';
+import { AddcardComponent } from './addcard/addcard.component';
+import { CardlistComponent } from './cardlist/cardlist.component';
+import { DescriptionComponent } from './description/description.component';
 
 
 
 @NgModule({
   declarations: [
     AppComponent,
+    TabComponent,
+    AddcardComponent,
+    CardlistComponent,
+    DescriptionComponent,
   ],
   imports: [
     BrowserModule,

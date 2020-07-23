@@ -2,7 +2,7 @@
     isEnable: boolean;
     EnableIcon: boolean;
     setPosition: boolean;
-    toggleQuery: Function;
+    //toggleQuery: Function;
     newCondition: Function;
     addCondition: Function;
     

@@ -2,3 +2,196 @@
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+
+.container{
+    margin: 5% 32%;
+}
+
+.title{
+    font-size: larger;
+ }
+
+
+
+.tab-height{
+ height: 28em;
+ 
+}
+
+.set-margin{
+    position: relative;
+    left: 31%;
+    top: 44%;
+}
+
+.set-position{
+    position: relative;
+    bottom: 5px;
+}
+
+.add-link{
+    color: blue;
+}
+
+.cursor{
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.block{
+    position: relative;
+    padding: 0.3em;
+    border: 1px solid #ebebeb;
+    background-color: white;
+    min-height: 21px;
+    width: 95%;
+}
+
+.set-border{
+    padding: 0.3em;
+}
+
+.query-position{
+    display: inline-block;
+    padding: 0.3em;
+    position: absolute;
+    left: 0px;
+    background-color: white;
+    width: 49px;
+    bottom: 1px;
+    //background-image: url('./fonts/icons8-unavailable-26.png');
+    //background-repeat: no-repeat;
+    //background-size: 18px;
+    //background-position: left;
+    padding-left: 21px;
+}
+
+.set-newmargin{
+   // padding-left: 5em;
+   display: inline-block;
+    position: absolute;
+    margin-left: 6em ;
+    //top: 11px;
+}
+
+.query-margin
+{
+    padding: 4px;
+    font-size: 17px;
+    position: absolute;
+    bottom: 16%;
+}
+
+.set-right{
+    position: absolute;
+    right: 0;
+}
+
+.condition-margin
+{
+    margin: 4% 0 4% 34%;
+    padding: 1% 0%;
+    background-color: white;
+    width: 21%;
+}
+
+.condition-margin :focus{
+outline: none;
+}
+
+input[type="button"]
+{
+    background-color: white;
+    border: none;
+    margin-left: 26%;
+}
+
+.input-container{
+    display: inline-block;
+    padding-left: 5em;
+}
+
+.input-container :focus{
+    outline: none;
+}
+
+.set-input
+{
+    border: none;
+    //margin-left: 50%;
+}
+
+.close-brace
+{
+    display: inline-block;
+    padding: 0.3em;
+    position: absolute;
+    right: 7px;
+    background-color: white;
+    bottom: 1px;
+    // background-size: 18px;
+    // background-position: left;
+    padding-left: 21px;
+}
+
+.close-brace:active{
+    outline:none
+
+}
+
+input[type="submit"]
+{
+    background-color: white;
+    border: none;
+    color: blue;
+    position: absolute;
+    font-size: large;
+    right: 0;
+}
+
+.disable-outline :hover{
+    outline: none;
+}
+
+ .selectStyle{
+    border: none;
+    background-color: white;
+    margin-left: 95px;
+ }
+
+ .selectStyle:focus{
+     outline: none;
+ }
+
+ .dropdownStyle{
+     display: inline-block;
+ }
+
+ .mat-form-field-infix{
+     padding: 0;
+     background-color: white;
+ }
+
+ .mat-form-field-infix:focus{
+     outline: none;
+ }
+
+ .mat-form-field-appearance-fill .mat-form-field-flex {
+     padding: 0;
+ }
+ .mat-form-field-wrapper{
+     padding-bottom: 0;
+ }
+
+ .filterStyle{
+    padding: 15px 0 16px 0;
+    box-shadow: 5px 5px 5px 10px ghostwhite inset;
+    margin-top: inherit;
+ }
+
+
+
+
+
+

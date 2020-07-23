@@ -1,0 +1,27 @@
+<mat-tab-group dynamicHeight>
+  <mat-tab label="Condition">
+    <div *ngIf="setEnable.isEnable else block" class="tab-height set-margin add-link">
+      <!-- <ng-container *ngTemplateOutlet="icon; context:{condition: setEnable.addCondition}"></ng-container> -->
+
+      <app-addcard [setEnable]="setEnable.addCondition"> </app-addcard>
+    </div>
+    <ng-template #block>
+
+      <app-cardlist [setEnable]="setEnable" [ArrayList]="ArrayList" [operator]="operator"></app-cardlist>
+
+    </ng-template>
+
+  </mat-tab>
+  <mat-tab label="Description">
+    <app-description></app-description>
+  </mat-tab>
+</mat-tab-group>
+
+
+
+<!-- <ng-template #icon let-enable="condition">
+    <mat-icon class="cursor" aria-hidden="false" aria-label="Example home icon" (click)="enable()">
+      add
+    </mat-icon>
+    <span class="set-position">New Condition</span>
+  </ng-template> -->
