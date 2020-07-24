@@ -17,6 +17,8 @@ import { TabComponent } from './tab/tab.component';
 import { AddcardComponent } from './addcard/addcard.component';
 import { CardlistComponent } from './cardlist/cardlist.component';
 import { DescriptionComponent } from './description/description.component';
+import { LogicalOperatorComponent } from './logical-operator/logical-operator.component';
+import {CardService} from './card.service';
 
 
 
@@ -27,6 +29,7 @@ import { DescriptionComponent } from './description/description.component';
     AddcardComponent,
     CardlistComponent,
     DescriptionComponent,
+    LogicalOperatorComponent,
   ],
   imports: [
     BrowserModule,
@@ -40,7 +43,7 @@ import { DescriptionComponent } from './description/description.component';
     DragDropModule,
     MatSelectModule
   ],
-  providers: [],
+  providers: [CardService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

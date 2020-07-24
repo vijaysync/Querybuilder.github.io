@@ -2,14 +2,12 @@
     isEnable: boolean;
     EnableIcon: boolean;
     setPosition: boolean;
-    //toggleQuery: Function;
     newCondition: Function;
     addCondition: Function;
     
 }
 
-export interface List {
-    
+export interface cardDetails {
     addIcon: boolean;
     buttonToggle: boolean;
     closeBrace: boolean;
@@ -18,7 +16,6 @@ export interface List {
     removeIcon: boolean;
     closeIcon: boolean;
     input: any;
-
     alert: boolean,
     selected: string
 }
@@ -32,10 +29,15 @@ export interface filter{
     resultData: any[];
 }
 
-export interface ButtonList {
+export interface operators {
     Query: {
         QueryName: string,
         setQuery: boolean
     };
     buttonHide: boolean;
+}
+
+export interface counter {
+    openBrace: number;
+    closeBrace: number;
 }

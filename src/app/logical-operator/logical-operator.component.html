@@ -1,0 +1,4 @@
+<div *ngIf="operator[index].buttonHide" mat-stroked-button class="condition-margin"
+    (click)="toggleQuery(index, operator[index].Query.setQuery)">
+    <input type="button" name="query{{index}}" class="form-control" [(ngModel)]="operator[index].Query.QueryName" />
+</div>

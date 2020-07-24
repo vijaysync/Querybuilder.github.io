@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import {  List, ButtonList, QueryData } from '../interface/queryData';
+import {  cardDetails, operators, QueryData } from '../interface/queryData';
 import { TabComponent  } from '../tab/tab.component';
 
 @Component({
@@ -9,8 +9,8 @@ import { TabComponent  } from '../tab/tab.component';
 })
 export class AddcardComponent implements OnInit {
 
-  @Input('ArrayList') ArrayList: List[];
-  @Input('operator') operator: ButtonList[];
+  @Input('ArrayList') ArrayList: cardDetails[];
+  @Input('operator') operator: operators[];
   @Input('setEnable') setEnable: Function;
   @ViewChild('TabComponent') addFunction: TabComponent;
 

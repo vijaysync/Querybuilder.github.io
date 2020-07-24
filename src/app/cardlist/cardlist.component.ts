@@ -1,6 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, CdkDrag } from '@angular/cdk/drag-drop';
-import {  List, ButtonList, QueryData } from '../interface/queryData';
+import { cardDetails, operators, QueryData } from '../interface/queryData';
+import { variables } from '../constants/common';
+import { CardService } from '../card.service';
 
 
 @Component({
@@ -10,37 +12,34 @@ import {  List, ButtonList, QueryData } from '../interface/queryData';
 })
 export class CardlistComponent implements OnInit {
 
-   @Input('ArrayList') List: List[];
-   @Input('operator') operator: ButtonList[];
-   @Input('setEnable') setEnable: QueryData;
+  @Input('ArrayList') List: cardDetails[];
+  @Input('operator') operator: operators[];
+  @Input('setEnable') setEnable: QueryData;
 
-  constructor() { }
+  constructor(public card: CardService) { }
+
+
 
   ngOnInit(): void {
   }
 
-    toggleQuery = (index: number, query: boolean) => {
+  submit = (e: any) => {
 
-    this.operator[index].Query.QueryName = query && 'or' || 'and';
-    this.operator[index].Query.setQuery = !query;
-  }
-
-  submit = (e: any)=>{
-    
   }
 
 
-  activeInput = (index: number) => {
-    this.List[index].hideVaribale = false;
+  activeInput = (index: number, isEnable: boolean) => {
+    this.List[index].hideVaribale = !isEnable;
   }
 
-  setOpenBrace = (index: number, addIcon: boolean, removeIcon: boolean, disable: boolean) => {
+  setOpenBrace = (index: number, addIcon: boolean, removeIcon: boolean, alert: boolean, disable: boolean) => {
     debugger;
     this.List[index].addIcon = !addIcon;
     if (disable) {
       this.List[index].removeIcon = !removeIcon;
-      this.List[0].alert = false
+      this.card.validation(index, alert, variables.OPEN)
     }
+
   }
 
   closeIcon = (index: number, closeIcon: boolean) => {
@@ -50,22 +49,28 @@ export class CardlistComponent implements OnInit {
   addIcon = (index: number, addIcon: boolean) => {
     debugger;
     this.List[index].addIcon = !addIcon;
-    this.setEnable.setPosition = false;
+    this.setEnable.setPosition = variables.DISABLE;
   }
 
-  setCloseBrace = (index: number, closeIcon: boolean, closebrace: boolean, diasble: boolean) => {
+  setCloseBrace = (index: number, closeIcon: boolean, closebrace: boolean, alert: boolean, diasble: boolean) => {
     this.List[index].closeIcon = !closeIcon;
-    if (diasble)
+    if (diasble) {
       this.List[index].closeBrace = !closebrace;
-
+      this.card.validation(index, alert, variables.CLOSE)
+    }
   }
+
   drop(event: CdkDragDrop<string[]>) {
     debugger;
     moveItemInArray(this.List, event.previousIndex, event.currentIndex);
     //moveItemInArray(this.List, event.currentIndex - 1, event.previousIndex);
   }
 
+  disableInput = (index: number, isEnable: boolean) => {
+    this.List[index].hideVaribale = !isEnable;
+  }
 
-  
+
+
 
 }

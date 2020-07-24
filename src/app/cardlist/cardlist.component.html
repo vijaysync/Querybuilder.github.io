@@ -6,12 +6,7 @@
     <form #temp="ngForm" (ngSubmit)="submit(temp)">
         <div cdkDropListLockAxis="y" cdkDropList (cdkDropListDropped)="drop($event)">
             <div *ngFor="let item of List;let i=index" cdkDrag>
-                <div *ngIf="operator[i].buttonHide" mat-stroked-button class="condition-margin"
-                    (click)="toggleQuery(i, operator[i].Query.setQuery)">
-                    <input type="button" name="query{{i}}" class="form-control"
-                        [(ngModel)]="operator[i].Query.QueryName" />
-                </div>
-
+                <app-logical-operator [operator]="operator" [index]="i"></app-logical-operator>
                 <div class="block" [ngStyle]="{'border-top': item.alert ? '2px solid red' : ''}">
                     <ng-container *ngIf="item.addIcon else enableQuery">
                         <mat-icon *ngIf="item.removeIcon else openbrace" class="cursor" aria-hidden="false"
@@ -26,11 +21,11 @@
                     </ng-container>
                     <ng-template #enableQuery>
                         <div class="query-position">
-                            <mat-icon (click)="setOpenBrace(i, item.addIcon, item.removeIcon, false)">
+                            <mat-icon (click)="setOpenBrace(i, item.addIcon, item.removeIcon, item.alert, false)">
                                 block
                             </mat-icon>
                             <span class="query-margin"
-                                (click)="setOpenBrace(i, item.addIcon, item.removeIcon, true)">&#40;</span>
+                                (click)="setOpenBrace(i, item.addIcon, item.removeIcon, item.alert, true)">&#40;</span>
                         </div>
                     </ng-template>
 
@@ -49,17 +44,15 @@
                 </mat-option>
               </mat-select>
             </mat-form-field> -->
-
-
-                    <span *ngIf="item.hideVaribale else showInput"
-                        class="set-newmargin" [ngStyle]="{'top': item.addIcon && item.removeIcon ? '11px' : '4px'}"
-                        (dblclick)="activeInput(i)">
-                        {{item.input || 'variable'+i}}
-                    </span>
+                    <div class="input-container" *ngIf="item.hideVaribale else showInput">
+                        <input type="text" [(ngModel)]="item.input" name="name{{i}}" class="set-input" (blur)="disableInput(i, item.hideVaribale)"/>
+                    </div>
                     <ng-template #showInput>
-                        <div class="input-container">
-                            <input type="text" [(ngModel)]="item.input" name="name{{i}}" class="set-input" />
-                        </div>
+                        <span class="set-newmargin"
+                            [ngStyle]="{'top': item.addIcon && item.removeIcon ? '11px' : '4px'}"
+                            (dblclick)="activeInput(i, item.hideVaribale)">
+                            {{item.input || 'variable'+i}}
+                        </span>
                     </ng-template>
                     <ng-container *ngIf="item.closeIcon else addQuery">
                         <mat-icon *ngIf="item.closeBrace else close" class="cursor set-right" aria-hidden="false"
@@ -74,11 +67,11 @@
                     </ng-container>
                     <ng-template #addQuery>
                         <div class="close-brace">
-                            <mat-icon (click)="setCloseBrace(i, item.closeIcon, item.closeBrace, false)">
+                            <mat-icon (click)="setCloseBrace(i, item.closeIcon, item.closeBrace, item.alert, false)">
                                 block
                             </mat-icon>
                             <span class="query-margin"
-                                (click)="setCloseBrace(i, item.closeIcon, item.closeBrace, true)">&#41;</span>
+                                (click)="setCloseBrace(i, item.closeIcon, item.closeBrace, item.alert, true)">&#41;</span>
                         </div>
                     </ng-template>
                 </div>
