@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { cardDetails, operators, QueryData, counter } from './interface/queryData';
-import { variables } from '../app/constants/common';
+import { CardDetails, Operators, QueryData, Counter } from '../interface/queryData';
+import { variables } from '../../app/constants/common';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +9,7 @@ export class CardService {
 
   constructor() { }
 
-  ArrayList: cardDetails[] = [{
+  ArrayList: CardDetails[] = [{
     addIcon: variables.ENABLE,
     buttonToggle: variables.DISABLE,
     closeBrace: variables.ENABLE,
@@ -17,21 +17,27 @@ export class CardService {
     hideVaribale: variables.ENABLE,
     removeIcon: variables.ENABLE,
     closeIcon: variables.ENABLE,
-    input: variables.VARIABLE + '0',
+    input: '',
     alert: variables.DISABLE,
-    selected: ''
-  }]
+    selected: '',
+    isAlert: variables.DISABLE,
+    toggleOpen: variables.DISABLE
+  }];
 
-  operator: operators[] = [{
+  operator: Operators[] = [{
     buttonHide: variables.DISABLE,
     Query: { QueryName: variables.AND, setQuery: variables.ENABLE }
-  }]
+  }];
 
-  addCondition: Function = () => {
-    this.setEnable.isEnable = variables.DISABLE
+  count: Counter = {
+    openBrace: variables.DEFAULT_VALUE,
+    closeBrace: variables.DEFAULT_VALUE
+  };
+  addCondition: () => void = () => {
+    this.setEnable.isEnable = variables.DISABLE;
   }
 
-  newCondition: Function = () => {
+  newCondition: () => void = () => {
     this.ArrayList.push({
       addIcon: variables.ENABLE,
       buttonToggle: variables.DISABLE,
@@ -40,50 +46,45 @@ export class CardService {
       hideVaribale: variables.ENABLE,
       removeIcon: variables.ENABLE,
       closeIcon: variables.ENABLE,
-      input: `${variables.VARIABLE}${this.ArrayList.length}`,
+      input: '',
       alert: variables.DISABLE,
-      selected: ''
-    })
+      selected: '',
+      isAlert: variables.DISABLE,
+      toggleOpen: variables.DISABLE
+    });
     this.operator.push({
       buttonHide: variables.ENABLE,
       Query: { QueryName: variables.AND, setQuery: variables.ENABLE },
-    })
+    });
   }
 
+  /* tslint:disable-next-line */
   setEnable: QueryData = {
     isEnable: variables.ENABLE,
     EnableIcon: variables.DISABLE,
     setPosition: variables.ENABLE,
     newCondition: this.newCondition,
     addCondition: this.addCondition,
-  }
+  };
 
-  count: counter = {
-    openBrace: variables.DEFAULT_VALUE,
-    closeBrace: variables.DEFAULT_VALUE
-  }
 
   validation = (index: number, alert: boolean, isOpen: string) => {
+
     if (isOpen === variables.CLOSE) {
-      this.count.closeBrace++
-      if (this.count.openBrace !== this.count.closeBrace || this.count.openBrace === 0)
+      this.count.closeBrace++;
+      if (this.count.openBrace !== this.count.closeBrace) {
         this.ArrayList[index].alert = !alert;
-      else if (alert) {
-        this.ArrayList[index].alert = !alert
       }
-    }
-    else {
-      this.count.openBrace++
-      if (this.count.closeBrace >= 1 && this.count.openBrace !== this.count.closeBrace)
+    } else {
+      this.count.openBrace++;
+      if (this.count.closeBrace >= 1 && this.count.openBrace !== this.count.closeBrace) {
         this.ArrayList[index].alert = !alert;
-      else if (alert) {
-        this.ArrayList[index].alert = !alert
       }
     }
     if (this.count.closeBrace === this.count.openBrace) {
-      this.ArrayList.forEach((val: cardDetails) => {
-        val.alert = variables.DISABLE
-      })
+      this.ArrayList.forEach((val: CardDetails) => {
+        val.alert = variables.DISABLE;
+      });
     }
   }
 }

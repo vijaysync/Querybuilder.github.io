@@ -1,13 +1,13 @@
- export class QueryData {
+export class QueryData {
     isEnable: boolean;
     EnableIcon: boolean;
     setPosition: boolean;
-    newCondition: Function;
-    addCondition: Function;
-    
+    newCondition: () => void;
+    addCondition: () => void;
+
 }
 
-export interface cardDetails {
+export interface CardDetails {
     addIcon: boolean;
     buttonToggle: boolean;
     closeBrace: boolean;
@@ -16,20 +16,13 @@ export interface cardDetails {
     removeIcon: boolean;
     closeIcon: boolean;
     input: any;
-    alert: boolean,
-    selected: string
+    alert: boolean;
+    selected: string;
+    isAlert: boolean;
+    toggleOpen: boolean;
 }
 
-export interface filter{
-    arr1: string[],
-    arr2: string[],
-    mockData: any[];
-    filterData : string[][];
-    copyData: any;
-    resultData: any[];
-}
-
-export interface operators {
+export interface Operators {
     Query: {
         QueryName: string,
         setQuery: boolean
@@ -37,7 +30,7 @@ export interface operators {
     buttonHide: boolean;
 }
 
-export interface counter {
+export interface Counter {
     openBrace: number;
     closeBrace: number;
 }

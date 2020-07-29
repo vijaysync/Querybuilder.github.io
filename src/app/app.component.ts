@@ -14,6 +14,5 @@ export class AppComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //console.log(this.viewContainerRef.createEmbeddedView(this.temp), 'template', this.newdiv, 'newdiv', this.cont, 'container');
   }
 }

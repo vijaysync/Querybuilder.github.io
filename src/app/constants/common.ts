@@ -1,11 +1,12 @@
 export const variables = {
     ENABLE: true,
     DISABLE: false,
-    AND: 'and',
-    OR: 'or',
+    AND: 'AND',
+    OR: 'OR',
     VARIABLE: 'variable',
     DEFAULT_VALUE: 0,
     OPEN: 'open',
-    CLOSE: 'close'
-    
-}
+    CLOSE: 'close',
+    ACTIVE: 'active',
+    INACTIVE: 'inactive'
+};

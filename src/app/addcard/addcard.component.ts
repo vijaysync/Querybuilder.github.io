@@ -1,6 +1,7 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import {  cardDetails, operators, QueryData } from '../interface/queryData';
-import { TabComponent  } from '../tab/tab.component';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
+import { CardDetails, Operators, QueryData } from '../interface/queryData';
+import { TabComponent } from '../tab/tab.component';
+import { CardlistComponent } from '.././cardlist/cardlist.component';
 
 @Component({
   selector: 'app-addcard',
@@ -9,20 +10,18 @@ import { TabComponent  } from '../tab/tab.component';
 })
 export class AddcardComponent implements OnInit {
 
-  @Input('ArrayList') ArrayList: cardDetails[];
-  @Input('operator') operator: operators[];
-  @Input('setEnable') setEnable: Function;
+  @Input() ArrayList: CardDetails[];
+  @Input() operator: Operators[];
+  @Input() setEnable: () => void;
   @ViewChild('TabComponent') addFunction: TabComponent;
+  @ViewChild(CardlistComponent, { static: false }) card: CardlistComponent;
 
   constructor() { }
 
   ngOnInit(): void {
   }
 
-  setCondition = ()=> {
-    this.setEnable()
+  setCondition = () => {
+    this.setEnable();
   }
-
-  
-
 }

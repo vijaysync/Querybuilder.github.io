@@ -18,7 +18,8 @@ import { AddcardComponent } from './addcard/addcard.component';
 import { CardlistComponent } from './cardlist/cardlist.component';
 import { DescriptionComponent } from './description/description.component';
 import { LogicalOperatorComponent } from './logical-operator/logical-operator.component';
-import {CardService} from './card.service';
+import {CardService} from './service/card.service';
+import { AutoFocusDirective } from './directive/auto-focus.directive';
 
 
 
@@ -30,6 +31,7 @@ import {CardService} from './card.service';
     CardlistComponent,
     DescriptionComponent,
     LogicalOperatorComponent,
+    AutoFocusDirective,
   ],
   imports: [
     BrowserModule,

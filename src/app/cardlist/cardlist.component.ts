@@ -1,8 +1,8 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef, ViewChildren, QueryList } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, CdkDrag } from '@angular/cdk/drag-drop';
-import { cardDetails, operators, QueryData } from '../interface/queryData';
+import { CardDetails, Operators, QueryData } from '../interface/queryData';
 import { variables } from '../constants/common';
-import { CardService } from '../card.service';
+import { CardService } from '../service/card.service';
 
 
 @Component({
@@ -12,13 +12,12 @@ import { CardService } from '../card.service';
 })
 export class CardlistComponent implements OnInit {
 
-  @Input('ArrayList') List: cardDetails[];
-  @Input('operator') operator: operators[];
-  @Input('setEnable') setEnable: QueryData;
+  @Input() ArrayList: CardDetails[];
+  @Input() operator: Operators[];
+  @Input() setEnable: QueryData;
+  @ViewChildren('ref') ref: QueryList<ElementRef>;
 
   constructor(public card: CardService) { }
-
-
 
   ngOnInit(): void {
   }
@@ -27,50 +26,51 @@ export class CardlistComponent implements OnInit {
 
   }
 
-
   activeInput = (index: number, isEnable: boolean) => {
-    this.List[index].hideVaribale = !isEnable;
+    this.ArrayList[index].hideVaribale = !isEnable;
   }
 
   setOpenBrace = (index: number, addIcon: boolean, removeIcon: boolean, alert: boolean, disable: boolean) => {
-    debugger;
-    this.List[index].addIcon = !addIcon;
-    if (disable) {
-      this.List[index].removeIcon = !removeIcon;
-      this.card.validation(index, alert, variables.OPEN)
+    this.ArrayList[index].addIcon = !addIcon;
+    if (disable || this.ArrayList[index].toggleOpen) {
+      this.ArrayList[index].removeIcon = !removeIcon;
+      this.card.validation(index, alert, variables.OPEN);
     }
 
   }
 
-  closeIcon = (index: number, closeIcon: boolean) => {
-    this.List[index].closeIcon = !closeIcon;
+  changeEvent = (e: any, alert: boolean, index: number) => {
+
+    if (e.invalid && e.dirty ) {
+      this.card.ArrayList[index].isAlert = !alert;
+    } else {
+      this.card.ArrayList[index].isAlert = false;
+    }
   }
 
-  addIcon = (index: number, addIcon: boolean) => {
-    debugger;
-    this.List[index].addIcon = !addIcon;
+  closeIcon = (index: number, closeIcon: boolean) => {
+    this.ArrayList[index].closeIcon = !closeIcon;
+  }
+
+  addIcon = (index: number, addIcon: boolean, toggle: boolean) => {
+    this.ArrayList[index].addIcon = !addIcon;
     this.setEnable.setPosition = variables.DISABLE;
+    this.ArrayList[index].toggleOpen = toggle;
   }
 
   setCloseBrace = (index: number, closeIcon: boolean, closebrace: boolean, alert: boolean, diasble: boolean) => {
-    this.List[index].closeIcon = !closeIcon;
+    this.ArrayList[index].closeIcon = !closeIcon;
     if (diasble) {
-      this.List[index].closeBrace = !closebrace;
-      this.card.validation(index, alert, variables.CLOSE)
+      this.ArrayList[index].closeBrace = !closebrace;
+      this.card.validation(index, alert, variables.CLOSE);
     }
   }
 
   drop(event: CdkDragDrop<string[]>) {
-    debugger;
-    moveItemInArray(this.List, event.previousIndex, event.currentIndex);
-    //moveItemInArray(this.List, event.currentIndex - 1, event.previousIndex);
+    moveItemInArray(this.ArrayList, event.previousIndex, event.currentIndex);
   }
 
   disableInput = (index: number, isEnable: boolean) => {
-    this.List[index].hideVaribale = !isEnable;
+    this.ArrayList[index].hideVaribale = !isEnable;
   }
-
-
-
-
 }

@@ -5,16 +5,17 @@
     </div>
     <form #temp="ngForm" (ngSubmit)="submit(temp)">
         <div cdkDropListLockAxis="y" cdkDropList (cdkDropListDropped)="drop($event)">
-            <div *ngFor="let item of List;let i=index" cdkDrag>
+            <div *ngFor="let item of ArrayList;let i=index" cdkDrag>
                 <app-logical-operator [operator]="operator" [index]="i"></app-logical-operator>
-                <div class="block" [ngStyle]="{'border-top': item.alert ? '2px solid red' : ''}">
+                <div class="block" [ngStyle]="{'border-top': item.alert ? '2px solid red' : ''}"
+                    [ngStyle]="{'border': item.isAlert ? '2px solid red' : ''}">
                     <ng-container *ngIf="item.addIcon else enableQuery">
                         <mat-icon *ngIf="item.removeIcon else openbrace" class="cursor" aria-hidden="false"
-                            aria-label="Example home icon" (click)="addIcon(i, item.addIcon)">
+                            aria-label="Example home icon" (click)="addIcon(i, item.addIcon, false)">
                             add
                         </mat-icon>
                         <ng-template #openbrace>
-                            <span class="query-margin">
+                            <span class="query-margin query-margin_1" (click)="addIcon(i, item.addIcon, true)">
                                 <a href="javascript:void(0)">&#40;</a>
                             </span>
                         </ng-template>
@@ -24,34 +25,19 @@
                             <mat-icon (click)="setOpenBrace(i, item.addIcon, item.removeIcon, item.alert, false)">
                                 block
                             </mat-icon>
-                            <span class="query-margin"
+                            <span class="query-margin query-margin_2"
                                 (click)="setOpenBrace(i, item.addIcon, item.removeIcon, item.alert, true)">&#40;</span>
                         </div>
                     </ng-template>
-
-
-                    <!-- <select (change)="select($event, i)" class="selectStyle">
-              <option *ngFor="let ListItem of keyValues; let k=index" value={{k}}>
-                {{ListItem}}
-              </option>
-            </select> -->
-
-                    <!-- <mat-form-field appearance="fill">
-              <mat-label>Favorite food</mat-label>
-              <mat-select [(value)]=item.selected>
-                <mat-option *ngFor="let food of keyValues;let k=index" value={{k}}>
-                  {{food}}
-                </mat-option>
-              </mat-select>
-            </mat-form-field> -->
                     <div class="input-container" *ngIf="item.hideVaribale else showInput">
-                        <input type="text" [(ngModel)]="item.input" name="name{{i}}" class="set-input" (blur)="disableInput(i, item.hideVaribale)"/>
+                        <input type="text" [(ngModel)]="item.input" #ref="ngModel" name="name{{i}}" class="set-input"
+                            (blur)="disableInput(i, item.hideVaribale)" required (input)="changeEvent(ref, isAlert, i)"
+                            appAutoFocus />
                     </div>
                     <ng-template #showInput>
-                        <span class="set-newmargin"
-                            [ngStyle]="{'top': item.addIcon && item.removeIcon ? '11px' : '4px'}"
+                        <span class="set-newmargin" [ngStyle]="{'top': item.addIcon && item.removeIcon ? '5px' : '4px'}"
                             (dblclick)="activeInput(i, item.hideVaribale)">
-                            {{item.input || 'variable'+i}}
+                            {{item.input || ''}}
                         </span>
                     </ng-template>
                     <ng-container *ngIf="item.closeIcon else addQuery">
@@ -70,7 +56,7 @@
                             <mat-icon (click)="setCloseBrace(i, item.closeIcon, item.closeBrace, item.alert, false)">
                                 block
                             </mat-icon>
-                            <span class="query-margin"
+                            <span class="query-margin query-margin_2"
                                 (click)="setCloseBrace(i, item.closeIcon, item.closeBrace, item.alert, true)">&#41;</span>
                         </div>
                     </ng-template>
