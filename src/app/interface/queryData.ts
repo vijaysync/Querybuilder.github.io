@@ -20,6 +20,7 @@ export interface CardDetails {
     selected: string;
     isAlert: boolean;
     toggleOpen: boolean;
+    toggleClose: boolean;
 }
 
 export interface Operators {

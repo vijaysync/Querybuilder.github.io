@@ -31,7 +31,7 @@
                     </ng-template>
                     <div class="input-container" *ngIf="item.hideVaribale else showInput">
                         <input type="text" [(ngModel)]="item.input" #ref="ngModel" name="name{{i}}" class="set-input"
-                            (blur)="disableInput(i, item.hideVaribale)" required (input)="changeEvent(ref, isAlert, i)"
+                            (blur)="disableInput(i, item.hideVaribale, ref)" required (input)="changeEvent(ref, isAlert, i)"
                             appAutoFocus />
                     </div>
                     <ng-template #showInput>
@@ -42,12 +42,12 @@
                     </ng-template>
                     <ng-container *ngIf="item.closeIcon else addQuery">
                         <mat-icon *ngIf="item.closeBrace else close" class="cursor set-right" aria-hidden="false"
-                            aria-label="Example home icon" (click)="closeIcon(i, item.closeIcon)">
+                            aria-label="Example home icon" (click)="closeIcon(i, item.closeIcon, false)">
                             add
                         </mat-icon>
                         <ng-template #close>
                             <span class="disable-outline">
-                                <input type=submit value=")" />
+                                <input type=submit value=")" (mouseup)="closeIcon(i, item.closeIcon, true)"/>
                             </span>
                         </ng-template>
                     </ng-container>

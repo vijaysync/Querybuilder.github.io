@@ -33,7 +33,12 @@ export class CardlistComponent implements OnInit {
   setOpenBrace = (index: number, addIcon: boolean, removeIcon: boolean, alert: boolean, disable: boolean) => {
     this.ArrayList[index].addIcon = !addIcon;
     if (disable || this.ArrayList[index].toggleOpen) {
-      this.ArrayList[index].removeIcon = !removeIcon;
+      if (disable && this.ArrayList[index].toggleOpen) {
+        this.ArrayList[index].removeIcon = false;
+      } else {
+        this.ArrayList[index].removeIcon = !removeIcon;
+      }
+
       this.card.validation(index, alert, variables.OPEN);
     }
 
@@ -41,15 +46,16 @@ export class CardlistComponent implements OnInit {
 
   changeEvent = (e: any, alert: boolean, index: number) => {
 
-    if (e.invalid && e.dirty ) {
+    if (e.invalid && e.dirty) {
       this.card.ArrayList[index].isAlert = !alert;
     } else {
       this.card.ArrayList[index].isAlert = false;
     }
   }
 
-  closeIcon = (index: number, closeIcon: boolean) => {
+  closeIcon = (index: number, closeIcon: boolean, toggle: boolean) => {
     this.ArrayList[index].closeIcon = !closeIcon;
+    this.ArrayList[index].toggleClose = toggle;
   }
 
   addIcon = (index: number, addIcon: boolean, toggle: boolean) => {
@@ -58,10 +64,14 @@ export class CardlistComponent implements OnInit {
     this.ArrayList[index].toggleOpen = toggle;
   }
 
-  setCloseBrace = (index: number, closeIcon: boolean, closebrace: boolean, alert: boolean, diasble: boolean) => {
+  setCloseBrace = (index: number, closeIcon: boolean, closebrace: boolean, alert: boolean, disable: boolean) => {
     this.ArrayList[index].closeIcon = !closeIcon;
-    if (diasble) {
-      this.ArrayList[index].closeBrace = !closebrace;
+    if (disable || this.ArrayList[index].toggleClose) {
+      if (disable && this.ArrayList[index].toggleClose) {
+        this.ArrayList[index].closeBrace = false;
+      } else {
+        this.ArrayList[index].closeBrace = !closebrace;
+      }
       this.card.validation(index, alert, variables.CLOSE);
     }
   }
@@ -70,7 +80,10 @@ export class CardlistComponent implements OnInit {
     moveItemInArray(this.ArrayList, event.previousIndex, event.currentIndex);
   }
 
-  disableInput = (index: number, isEnable: boolean) => {
+  disableInput = (index: number, isEnable: boolean, ref: any) => {
+    if (!ref.value) {
+      this.ArrayList[index].isAlert = variables.ENABLE;
+    }
     this.ArrayList[index].hideVaribale = !isEnable;
   }
 }

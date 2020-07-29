@@ -21,7 +21,8 @@ export class CardService {
     alert: variables.DISABLE,
     selected: '',
     isAlert: variables.DISABLE,
-    toggleOpen: variables.DISABLE
+    toggleOpen: variables.DISABLE,
+    toggleClose: variables.DISABLE
   }];
 
   operator: Operators[] = [{
@@ -50,7 +51,8 @@ export class CardService {
       alert: variables.DISABLE,
       selected: '',
       isAlert: variables.DISABLE,
-      toggleOpen: variables.DISABLE
+      toggleOpen: variables.DISABLE,
+      toggleClose: variables.DISABLE
     });
     this.operator.push({
       buttonHide: variables.ENABLE,
