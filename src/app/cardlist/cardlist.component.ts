@@ -38,10 +38,11 @@ export class CardlistComponent implements OnInit {
       } else {
         this.ArrayList[index].removeIcon = !removeIcon;
       }
-
-      this.card.validation(index, alert, variables.OPEN);
+      if (disable) {
+        this.card.ArrayList[index].openBrace = true;
+        this.card.validation(index, alert, variables.OPEN);
+      }
     }
-
   }
 
   changeEvent = (e: any, alert: boolean, index: number) => {
@@ -72,7 +73,10 @@ export class CardlistComponent implements OnInit {
       } else {
         this.ArrayList[index].closeBrace = !closebrace;
       }
-      this.card.validation(index, alert, variables.CLOSE);
+      if (disable) {
+        this.card.ArrayList[index].closeBrac = true;
+        this.card.validation(index, alert, variables.CLOSE);
+      }
     }
   }
 

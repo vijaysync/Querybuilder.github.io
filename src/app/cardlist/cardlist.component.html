@@ -31,7 +31,7 @@
                     </ng-template>
                     <div class="input-container" *ngIf="item.hideVaribale else showInput">
                         <input type="text" [(ngModel)]="item.input" #ref="ngModel" name="name{{i}}" class="set-input"
-                            (blur)="disableInput(i, item.hideVaribale, ref)" required (input)="changeEvent(ref, isAlert, i)"
+                            (blur)="disableInput(i, item.hideVaribale, ref)" required (input)="changeEvent(ref, item.isAlert, i)"
                             appAutoFocus />
                     </div>
                     <ng-template #showInput>

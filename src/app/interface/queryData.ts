@@ -21,6 +21,8 @@ export interface CardDetails {
     isAlert: boolean;
     toggleOpen: boolean;
     toggleClose: boolean;
+    openBrace: boolean;
+    closeBrac: boolean;
 }
 
 export interface Operators {
@@ -29,9 +31,4 @@ export interface Operators {
         setQuery: boolean
     };
     buttonHide: boolean;
-}
-
-export interface Counter {
-    openBrace: number;
-    closeBrace: number;
 }

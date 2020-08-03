@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CardDetails, Operators, QueryData, Counter } from '../interface/queryData';
+import { CardDetails, Operators, QueryData } from '../interface/queryData';
 import { variables } from '../../app/constants/common';
 
 @Injectable({
@@ -22,7 +22,9 @@ export class CardService {
     selected: '',
     isAlert: variables.DISABLE,
     toggleOpen: variables.DISABLE,
-    toggleClose: variables.DISABLE
+    toggleClose: variables.DISABLE,
+    openBrace: variables.DISABLE,
+    closeBrac: variables.DISABLE
   }];
 
   operator: Operators[] = [{
@@ -30,10 +32,6 @@ export class CardService {
     Query: { QueryName: variables.AND, setQuery: variables.ENABLE }
   }];
 
-  count: Counter = {
-    openBrace: variables.DEFAULT_VALUE,
-    closeBrace: variables.DEFAULT_VALUE
-  };
   addCondition: () => void = () => {
     this.setEnable.isEnable = variables.DISABLE;
   }
@@ -52,7 +50,9 @@ export class CardService {
       selected: '',
       isAlert: variables.DISABLE,
       toggleOpen: variables.DISABLE,
-      toggleClose: variables.DISABLE
+      toggleClose: variables.DISABLE,
+      openBrace: variables.DISABLE,
+      closeBrac: variables.DISABLE
     });
     this.operator.push({
       buttonHide: variables.ENABLE,
@@ -72,21 +72,31 @@ export class CardService {
 
   validation = (index: number, alert: boolean, isOpen: string) => {
 
-    if (isOpen === variables.CLOSE) {
-      this.count.closeBrace++;
-      if (this.count.openBrace !== this.count.closeBrace) {
-        this.ArrayList[index].alert = !alert;
+    let count1 = 0;
+    let count2 = 0;
+
+    for (let i = (isOpen === variables.CLOSE) ? 0 : index;
+      (isOpen === variables.CLOSE) ? i <= index : i < this.ArrayList.length; i++) {
+      if (this.ArrayList[i].openBrace) {
+        count1++;
       }
+      if (this.ArrayList[i].closeBrac) {
+        count2++;
+      }
+    }
+    if (count2 !== count1) {
+      if (isOpen === variables.OPEN && index === 0) {
+        return;
+      }
+      this.ArrayList[index].alert = !alert;
     } else {
-      this.count.openBrace++;
-      if (this.count.closeBrace >= 1 && this.count.openBrace !== this.count.closeBrace) {
-        this.ArrayList[index].alert = !alert;
-      }
+      this.disable();
     }
-    if (this.count.closeBrace === this.count.openBrace) {
-      this.ArrayList.forEach((val: CardDetails) => {
-        val.alert = variables.DISABLE;
-      });
-    }
+  }
+
+  disable = () => {
+    this.ArrayList.map((val, i) => {
+      this.ArrayList[i].alert = variables.DISABLE;
+    });
   }
 }
